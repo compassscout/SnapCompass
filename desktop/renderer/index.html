@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>SnapCompass Desktop</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0f24; --panel: #151834; --panel2: #1b1f42;
+    --line: rgba(139, 92, 246, .25); --text: #ecedff;
+    --muted: #9aa0d0; --accent: #8b5cf6;
+  }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text); overflow: hidden;
+    font: 13px/1.5 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    display: flex; flex-direction: column;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+
+  .toolbar {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    background: linear-gradient(90deg, rgba(139,92,246,.14), transparent 40%), var(--panel);
+    border-bottom: 1px solid var(--line);
+  }
+  .toolbar .logo { display: flex; align-items: center; gap: 8px; margin-right: 10px; }
+  .toolbar .logo img { width: 22px; height: 22px; }
+  .toolbar .logo strong { font-size: 13.5px; }
+  .tbtn {
+    padding: 6px 13px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--panel2); font-weight: 600; font-size: 12.5px;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: filter .12s, transform .1s;
+  }
+  .tbtn:hover { filter: brightness(1.18); }
+  .tbtn:active { transform: scale(.97); }
+  .tbtn.accent { background: linear-gradient(135deg, var(--accent), #22d3ee); border: 0; color: #fff; }
+  .tbtn.rec { background: #b91c1c; border-color: #ef4444; color: #fff; }
+  .rec-timer {
+    display: none; align-items: center; gap: 6px; color: #fca5a5;
+    font-variant-numeric: tabular-nums; font-weight: 700; font-size: 12.5px;
+  }
+  .rec-timer.on { display: inline-flex; }
+  .rec-dot { width: 9px; height: 9px; border-radius: 50%; background: #ef4444; animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: .25; } }
+  .spacer { flex: 1; }
+  .fmt { background: var(--panel2); border: 1px solid var(--line); color: var(--text); border-radius: 8px; padding: 5px 8px; font-size: 12px; }
+
+  #editorFrame { flex: 1; border: 0; width: 100%; min-height: 0; }
+
+  /* source picker modal */
+  .modal-mask {
+    position: fixed; inset: 0; display: none; place-items: center;
+    background: rgba(5, 7, 20, .72); z-index: 50; backdrop-filter: blur(4px);
+  }
+  .modal-mask.on { display: grid; }
+  .modal {
+    width: min(860px, 92vw); max-height: 80vh; overflow: auto;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px;
+  }
+  .modal h3 { font-size: 14px; margin-bottom: 12px; }
+  .src-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .src-item {
+    border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden;
+    background: var(--panel2); text-align: left; padding: 0;
+    transition: border-color .12s, transform .1s;
+  }
+  .src-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .src-item img { width: 100%; height: 100px; object-fit: cover; display: block; background: #000; }
+  .src-item .nm { padding: 7px 9px; font-size: 11.5px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .modal .foot { margin-top: 14px; display: flex; justify-content: flex-end; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="logo">
+      <img src="../build/icon.png" alt="" />
+      <strong>SnapCompass</strong>
+    </div>
+    <button id="btnFull" class="tbtn accent">📷 截取全屏</button>
+    <button id="btnRegion" class="tbtn">✂ 框选区域 <small style="opacity:.6">Ctrl+Shift+X</small></button>
+    <button id="btnRec" class="tbtn">⏺ 开始录屏</button>
+    <span id="recTimer" class="rec-timer"><span class="rec-dot"></span><span id="recTime">00:00</span></span>
+    <button id="btnOpen" class="tbtn">📂 打开图片</button>
+    <input type="file" id="fileInput" accept="image/*" hidden />
+    <span class="spacer"></span>
+    <select id="recFmt" class="fmt" title="录屏格式">
+      <option value="mp4">视频 (MP4/WebM)</option>
+      <option value="gif">GIF 动图</option>
+    </select>
+  </div>
+
+  <iframe id="editorFrame" src="editor.html"></iframe>
+
+  <div class="modal-mask" id="srcModal">
+    <div class="modal">
+      <h3>选择录制来源</h3>
+      <div class="src-grid" id="srcGrid"></div>
+      <div class="foot"><button class="tbtn" id="srcCancel">取消</button></div>
+    </div>
+  </div>
+
+  <script src="../vendor/gif.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

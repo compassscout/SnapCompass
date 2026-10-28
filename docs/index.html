@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SnapCompass — Capture, annotate &amp; record your screen</title>
+<meta name="description" content="SnapCompass is a free, open-source screenshot and screen recording toolkit. Full-page captures, precise annotations, GIF/MP4 recording and PDF export — in your browser and on your desktop." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238b5cf6'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='url(%23g)' stroke-width='3'/%3E%3Cpath d='M16 6 L20 16 L16 26 L12 16 Z' fill='url(%23g)'/%3E%3C/svg%3E" />
+<style>
+:root{
+  --bg:#0a0c1d; --bg2:#0d0f24; --panel:#141735; --panel2:#1a1e42;
+  --line:rgba(139,92,246,.22); --line2:rgba(139,92,246,.4);
+  --text:#eef0ff; --muted:#9ba1d2; --muted2:#6f75a8;
+  --violet:#8b5cf6; --cyan:#22d3ee;
+  --grad:linear-gradient(120deg,#8b5cf6 0%,#22d3ee 100%);
+  --radius:16px;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono)}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:50;background:rgba(10,12,29,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:.2px}
+.logo svg{width:28px;height:28px}
+.nav-links{display:flex;gap:28px;font-size:13.5px;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:11px;font-weight:600;font-size:14px;border:1px solid transparent;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;white-space:nowrap}
+.btn-primary{background:var(--grad);color:#0a0c1d;box-shadow:0 8px 28px rgba(139,92,246,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(139,92,246,.5)}
+.btn-ghost{border-color:var(--line2);color:var(--text);background:rgba(139,92,246,.06)}
+.btn-ghost:hover{background:rgba(139,92,246,.14);transform:translateY(-2px)}
+.btn-sm{padding:8px 16px;font-size:13px}
+@media(max-width:760px){.nav-links{display:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:96px 0 72px;text-align:center}
+.hero::before{content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(720px 380px at 50% -80px,rgba(139,92,246,.28),transparent 70%),
+    radial-gradient(520px 300px at 85% 20%,rgba(34,211,238,.12),transparent 70%);
+  pointer-events:none}
+.hero .wrap{position:relative}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid var(--line2);border-radius:999px;font-size:12px;color:var(--muted);background:rgba(139,92,246,.08)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399}
+h1{font-size:clamp(38px,6vw,64px);line-height:1.08;letter-spacing:-.02em;font-weight:800;margin:26px 0 18px}
+h1 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{max-width:620px;margin:0 auto;color:var(--muted);font-size:17px}
+.hero-cta{display:flex;gap:14px;justify-content:center;margin:34px 0 14px;flex-wrap:wrap}
+.hero small.note{display:block;color:var(--muted2);font-size:12px}
+.hero-shot{margin:56px auto 0;max-width:920px;position:relative}
+.hero-shot img{border-radius:var(--radius);border:1px solid var(--line2);box-shadow:0 40px 120px rgba(0,0,0,.55),0 0 0 1px rgba(139,92,246,.15)}
+.hero-shot::after{content:"";position:absolute;inset:auto -6% -40px -6%;height:120px;background:radial-gradient(60% 100% at 50% 0,rgba(139,92,246,.25),transparent 75%);filter:blur(20px);z-index:-1}
+.kbd-hint{display:flex;gap:18px;justify-content:center;margin-top:26px;color:var(--muted2);font-size:12px;flex-wrap:wrap}
+kbd{font-family:var(--mono);background:var(--panel2);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:11px;color:var(--muted)}
+
+/* ---------- trust strip ---------- */
+.strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2)}
+.strip .wrap{display:flex;justify-content:center;gap:44px;padding:18px 24px;flex-wrap:wrap}
+.strip span{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px}
+.strip svg{width:16px;height:16px;stroke:#34d399;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- sections ---------- */
+section{padding:88px 0}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 54px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--violet);margin-bottom:14px}
+h2{font-size:clamp(28px,4vw,40px);letter-spacing:-.02em;line-height:1.15;font-weight:800}
+.sec-head p{color:var(--muted);margin-top:14px;font-size:15.5px}
+
+/* feature cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.cards{grid-template-columns:1fr}}
+.card{background:linear-gradient(160deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:var(--radius);padding:26px;transition:transform .2s ease,border-color .2s ease}
+.card:hover{transform:translateY(-4px);border-color:var(--line2)}
+.card .icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(139,92,246,.14);border:1px solid var(--line2);margin-bottom:16px}
+.card .icon svg{width:22px;height:22px;fill:none;stroke:#c4b0ff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.card h3{font-size:16.5px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:13.5px}
+.card .tag{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--cyan);background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);padding:2px 9px;border-radius:999px}
+
+/* split feature */
+.split{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+.split.rev{grid-template-columns:1fr 1.05fr}
+@media(max-width:900px){.split,.split.rev{grid-template-columns:1fr;gap:32px}}
+.split h3{font-size:clamp(22px,3vw,30px);letter-spacing:-.01em;margin-bottom:14px}
+.split p{color:var(--muted);font-size:15px;margin-bottom:18px}
+.split ul{list-style:none;display:grid;gap:10px;margin-bottom:24px}
+.split li{display:flex;gap:10px;color:var(--muted);font-size:14px;align-items:flex-start}
+.split li svg{flex:none;width:17px;height:17px;margin-top:3px;stroke:#34d399;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.split .shot{border-radius:var(--radius);border:1px solid var(--line2);box-shadow:0 30px 90px rgba(0,0,0,.5)}
+.shot-frame{background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius);overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.5)}
+.shot-frame .bar{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.shot-frame .bar i{width:10px;height:10px;border-radius:50%;background:#3a3f6e}
+.shot-frame .bar i:first-child{background:#f43f5e}.shot-frame .bar i:nth-child(2){background:#fbbf24}.shot-frame .bar i:nth-child(3){background:#34d399}
+.shot-frame img{display:block}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:step}
+@media(max-width:760px){.steps{grid-template-columns:1fr}}
+.step{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:28px;position:relative}
+.step .num{font-family:var(--mono);font-size:13px;color:var(--cyan);border:1px solid rgba(34,211,238,.3);width:34px;height:34px;border-radius:10px;display:grid;place-items:center;margin-bottom:16px;background:rgba(34,211,238,.06)}
+.step h3{font-size:16px;margin-bottom:8px}
+.step p{color:var(--muted);font-size:13.5px}
+
+/* platforms */
+.platforms{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){.platforms{grid-template-columns:1fr}}
+.platform{background:linear-gradient(160deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:var(--radius);padding:34px}
+.platform h3{font-size:19px;margin:14px 0 8px;display:flex;align-items:center;gap:10px}
+.platform p{color:var(--muted);font-size:14px;margin-bottom:22px}
+.platform .picon{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(139,92,246,.14);border:1px solid var(--line2)}
+.platform .picon svg{width:24px;height:24px;fill:none;stroke:#c4b0ff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* faq */
+.faq{max-width:720px;margin:0 auto}
+.faq details{border:1px solid var(--line);border-radius:12px;background:var(--bg2);margin-bottom:10px;overflow:hidden}
+.faq summary{cursor:pointer;padding:17px 22px;font-weight:600;font-size:14.5px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:20px;color:var(--violet);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding:0 22px 18px;color:var(--muted);font-size:13.5px}
+
+/* final cta */
+.final{text-align:center;position:relative;padding:100px 0}
+.final::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 300px at 50% 100%,rgba(139,92,246,.22),transparent 70%);pointer-events:none}
+.final .wrap{position:relative}
+.final p{color:var(--muted);margin:16px auto 32px;max-width:520px}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:36px 0;color:var(--muted2);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+footer a:hover{color:var(--text)}
+footer .fl{display:flex;gap:22px}
+
+/* reveal (fail-open: visible by default, JS adds .rv to enable) */
+.rv .rv-item{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.rv .rv-item.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv .rv-item{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="#top" aria-label="SnapCompass home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="none" stroke="url(#lg)" stroke-width="2.4"/><path d="M16 6 L20 16 L16 26 L12 16 Z" fill="url(#lg)" opacity=".9"/><circle cx="16" cy="16" r="2.4" fill="#fff"/></svg>
+      SnapCompass
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#platforms">Platforms</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/compassscout/SnapCompass" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <a class="btn btn-primary btn-sm" href="https://github.com/compassscout/SnapCompass" target="_blank" rel="noopener">Get SnapCompass — Free</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="badge rv-item"><span class="dot"></span> Free &amp; open source · v1.0</span>
+    <h1 class="rv-item">Capture anything.<br /><span class="grad">Annotate everything.</span></h1>
+    <p class="sub rv-item">Full-page, region and visible-area screenshots, a precise annotation studio, and GIF/MP4 screen recording — in one lightweight toolkit for your browser and your desktop.</p>
+    <div class="hero-cta rv-item">
+      <a class="btn btn-primary" href="https://github.com/compassscout/SnapCompass" target="_blank" rel="noopener">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.58 9.58 0 0 1 5 0c1.91-1.3 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.69 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
+        Get SnapCompass — Free
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/compassscout/SnapCompass/releases" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v13M6 11l6 6 6-6M4 21h16"/></svg>
+        Download for Windows
+      </a>
+    </div>
+    <small class="note rv-item">No account required · Everything is processed locally</small>
+
+    <div class="hero-shot rv-item">
+      <img src="assets/hero-editor.jpg" alt="SnapCompass annotation editor" width="920" height="518" loading="eager" />
+    </div>
+    <div class="kbd-hint rv-item">
+      <span><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> visible area</span>
+      <span><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> full page</span>
+      <span><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> region</span>
+      <span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> desktop capture</span>
+    </div>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="wrap">
+    <span><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg> 100% local processing</span>
+    <span><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg> No watermarks</span>
+    <span><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg> Open source (MIT)</span>
+    <span><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg> Chrome extension + Windows app</span>
+    <span><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg> No sign-up, ever</span>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow rv-item">Features</div>
+      <h2 class="rv-item">One toolkit, every capture workflow</h2>
+      <p class="rv-item">From a quick visible-area snap to a pixel-perfect full-page capture, from arrows to mosaics, from a 5-second GIF to a narrated MP4 — SnapCompass covers the whole loop.</p>
+    </div>
+    <div class="cards">
+      <div class="card rv-item">
+        <div class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+        <h3>Full-page capture</h3>
+        <p>Scroll-stitched captures of entire pages — even long documentation and infinite-scroll pages. Sticky headers are automatically de-duplicated.</p>
+        <span class="tag">FireShot-grade stitching</span>
+      </div>
+      <div class="card rv-item">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/></svg></div>
+        <h3>Region &amp; visible area</h3>
+        <p>Drag to select exactly the pixels you need, or grab the viewport in one keystroke. Device-pixel-ratio aware for crisp Retina results.</p>
+        <span class="tag">Pixel-precise</span>
+      </div>
+      <div class="card rv-item">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 20l1.5-4.5L16 5l3 3L8.5 18.5z"/><path d="M14 7l3 3"/></svg></div>
+        <h3>Annotation studio</h3>
+        <p>Pen, arrows, rectangles, ellipses, text, mosaic blur and crop — with colors, stroke widths, undo and instant clipboard copy.</p>
+        <span class="tag">Awesome-grade markup</span>
+      </div>
+      <div class="card rv-item">
+        <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10l5-3v10l-5-3"/></svg></div>
+        <h3>Screen recording</h3>
+        <p>Record a tab, a window or the whole desktop. Export as MP4 for sharing, or as a compact looping GIF for docs and issue reports.</p>
+        <span class="tag">GIF + MP4</span>
+      </div>
+      <div class="card rv-item">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 3v13M6 11l6 6 6-6"/><path d="M4 21h16"/></svg></div>
+        <h3>PNG · JPG · PDF export</h3>
+        <p>Save annotated captures in the format your workflow needs — including single-page PDFs, FireShot-style, with one click.</p>
+        <span class="tag">1-click export</span>
+      </div>
+      <div class="card rv-item">
+        <div class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+        <h3>Private by design</h3>
+        <p>No uploads, no accounts, no tracking pixels. Every capture is stitched, annotated and encoded on your own machine.</p>
+        <span class="tag">Local-first</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow rv-item">How it works</div>
+      <h2 class="rv-item">From capture to share in three steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step rv-item">
+        <div class="num">01</div>
+        <h3>Capture</h3>
+        <p>Click the toolbar button or press a shortcut. Choose visible area, full page, a dragged region — or hit record for the screen.</p>
+      </div>
+      <div class="step rv-item">
+        <div class="num">02</div>
+        <h3>Annotate</h3>
+        <p>The capture opens instantly in the editor. Drop arrows, text and mosaic blur exactly where they belong. Undo is always one keystroke away.</p>
+      </div>
+      <div class="step rv-item">
+        <div class="num">03</div>
+        <h3>Export &amp; share</h3>
+        <p>Copy to clipboard, or save as PNG, JPG, PDF, GIF or MP4. Files land straight in your Downloads folder — nothing touches a server.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="platforms">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow rv-item">Platforms</div>
+      <h2 class="rv-item">In your browser, and on your desktop</h2>
+      <p class="rv-item">The same capture engine and the same annotation studio, delivered where you actually work.</p>
+    </div>
+    <div class="platforms">
+      <div class="platform rv-item">
+        <div class="picon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.4"/><path d="M12 3v5.6M4.6 8.5l5 2.8M19.4 8.5l-5 2.8"/></svg></div>
+        <h3>Chrome extension</h3>
+        <p>Manifest V3, keyboard shortcuts, right-click capture menu and a popup recorder. Works on Chrome, Edge, Brave and every Chromium browser.</p>
+        <a class="btn btn-primary btn-sm" href="https://github.com/compassscout/SnapCompass" target="_blank" rel="noopener">Get SnapCompass — Free</a>
+      </div>
+      <div class="platform rv-item">
+        <div class="picon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <h3>Windows desktop app</h3>
+        <p>Electron-powered desktop capture with a global hotkey (<span class="mono">Ctrl+Shift+X</span>), region selection overlay, tray icon and native .exe installer.</p>
+        <a class="btn btn-ghost btn-sm" href="https://github.com/compassscout/SnapCompass/releases" target="_blank" rel="noopener">Download .exe</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="background:var(--bg2);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow rv-item">FAQ</div>
+      <h2 class="rv-item">Questions, answered</h2>
+    </div>
+    <div class="faq">
+      <details class="rv-item">
+        <summary>Is SnapCompass really free?</summary>
+        <p>Yes — free and MIT-licensed open source. Every feature (full-page capture, annotation, GIF/MP4 recording, PDF export) is included with no paywall and no watermarks.</p>
+      </details>
+      <details class="rv-item">
+        <summary>Where do my screenshots and recordings go?</summary>
+        <p>Nowhere but your disk. Capturing, stitching, annotation rendering and GIF/MP4 encoding all happen locally in your browser or the desktop app. There is no account system and no upload step.</p>
+      </details>
+      <details class="rv-item">
+        <summary>How do I install the Chrome extension?</summary>
+        <p>Clone or download the repository, open <span class="mono">chrome://extensions</span>, enable Developer mode, and choose "Load unpacked" pointing at the <span class="mono">extension/</span> folder. A Chrome Web Store listing is planned.</p>
+      </details>
+      <details class="rv-item">
+        <summary>Which browsers and operating systems are supported?</summary>
+        <p>The extension runs on any Manifest-V3 Chromium browser (Chrome, Edge, Brave, Arc…). The desktop app targets Windows 10/11 as a native .exe; the codebase is Electron, so macOS and Linux builds are possible from source.</p>
+      </details>
+      <details class="rv-item">
+        <summary>What are the GIF recording limits?</summary>
+        <p>GIFs are capped at 60 seconds and 640&nbsp;px width to keep file sizes sane for docs and issue trackers. For longer or higher-resolution captures, record in MP4 instead.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2 class="rv-item">Point. Capture. <span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">Done.</span></h2>
+    <p class="rv-item">Stop juggling five tools for screenshots, markups and recordings. SnapCompass keeps the whole loop in one place — free, local and open source.</p>
+    <div class="hero-cta rv-item">
+      <a class="btn btn-primary" href="https://github.com/compassscout/SnapCompass" target="_blank" rel="noopener">Get SnapCompass — Free</a>
+      <a class="btn btn-ghost" href="https://github.com/compassscout/SnapCompass" target="_blank" rel="noopener">Star on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 SnapCompass · MIT License</span>
+    <div class="fl">
+      <a href="https://github.com/compassscout/SnapCompass" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/compassscout/SnapCompass/releases" target="_blank" rel="noopener">Releases</a>
+      <a href="https://github.com/compassscout/SnapCompass/issues" target="_blank" rel="noopener">Issues</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal — fails open: content is fully visible without JS.
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+  document.body.classList.add('rv');
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.rv-item').forEach((el) => io.observe(el));
+}
+</script>
+</body>
+</html>

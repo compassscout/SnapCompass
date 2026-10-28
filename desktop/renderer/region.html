@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>SnapCompass — Region</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: rgba(8, 10, 26, .35);
+    cursor: crosshair; overflow: hidden; user-select: none;
+    font: 12px/1.4 -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  }
+  #sel {
+    position: absolute; display: none;
+    border: 1.5px solid #22d3ee; background: transparent;
+    box-shadow: 0 0 0 99999px rgba(8, 10, 26, .55);
+  }
+  #hint {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+    background: rgba(13, 15, 36, .92); color: #ecedff; border: 1px solid rgba(139,92,246,.5);
+    border-radius: 999px; padding: 7px 18px; pointer-events: none; white-space: nowrap;
+  }
+  #dims {
+    position: absolute; display: none; background: #22d3ee; color: #06202a;
+    border-radius: 6px; padding: 2px 8px; font-weight: 700; pointer-events: none; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+  <div id="hint">拖拽框选截图区域 · Esc 取消</div>
+  <div id="sel"></div>
+  <div id="dims"></div>
+<script>
+  const sel = document.getElementById('sel');
+  const dims = document.getElementById('dims');
+  const hint = document.getElementById('hint');
+  let start = null;
+  let rect = null;
+
+  function norm(a, b) {
+    return {
+      x: Math.min(a.x, b.x),
+      y: Math.min(a.y, b.y),
+      w: Math.abs(b.x - a.x),
+      h: Math.abs(b.y - a.y)
+    };
+  }
+
+  function paint() {
+    if (!rect) { sel.style.display = 'none'; dims.style.display = 'none'; return; }
+    sel.style.display = 'block';
+    sel.style.left = rect.x + 'px';
+    sel.style.top = rect.y + 'px';
+    sel.style.width = rect.w + 'px';
+    sel.style.height = rect.h + 'px';
+    dims.style.display = 'block';
+    dims.textContent = Math.round(rect.w) + ' × ' + Math.round(rect.h);
+    const dy = rect.y + rect.h + 8;
+    dims.style.left = Math.max(4, rect.x) + 'px';
+    dims.style.top = (dy + 24 > innerHeight ? rect.y - 30 : dy) + 'px';
+  }
+
+  window.addEventListener('mousedown', (e) => {
+    start = { x: e.clientX, y: e.clientY };
+    rect = { x: start.x, y: start.y, w: 0, h: 0 };
+    hint.style.display = 'none';
+    paint();
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!start) return;
+    rect = norm(start, { x: e.clientX, y: e.clientY });
+    paint();
+  });
+
+  window.addEventListener('mouseup', (e) => {
+    if (!start) return;
+    rect = norm(start, { x: e.clientX, y: e.clientY });
+    start = null;
+    if (rect.w > 4 && rect.h > 4) {
+      window.snapApi.sendRegionSelected(rect);
+    } else {
+      rect = null;
+      hint.style.display = '';
+      paint();
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') window.snapApi.sendRegionCancelled();
+  });
+</script>
+</body>
+</html>

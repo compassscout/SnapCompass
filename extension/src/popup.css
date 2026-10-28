@@ -1,0 +1,88 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d0f24;
+  --panel: #151834;
+  --panel2: #1b1f42;
+  --line: rgba(139, 92, 246, .25);
+  --text: #ecedff;
+  --muted: #9aa0d0;
+  --accent1: #8b5cf6;
+  --accent2: #22d3ee;
+  --danger: #f43f5e;
+}
+html { width: 340px; }
+body {
+  background: radial-gradient(120% 160% at 100% 0%, #1a1e45 0%, var(--bg) 60%);
+  color: var(--text);
+  font: 13px/1.5 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px;
+}
+.logo { display: flex; align-items: center; gap: 9px; }
+.logo strong { font-size: 14px; letter-spacing: .2px; }
+.logo .ver { color: var(--muted); font-size: 11px; margin-left: 6px; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+.ghost {
+  color: var(--muted); font-size: 12px; padding: 5px 10px;
+  border: 1px solid var(--line); border-radius: 8px;
+}
+.ghost:hover { color: var(--text); background: var(--panel2); }
+main { padding: 4px 16px 12px; }
+
+.capture-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cap {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 13px 6px 11px; border-radius: 12px;
+  background: var(--panel); border: 1px solid var(--line);
+  transition: transform .12s ease, background .12s ease, border-color .12s;
+}
+.cap:hover { background: var(--panel2); border-color: rgba(139, 92, 246, .55); transform: translateY(-1px); }
+.cap:active { transform: translateY(0) scale(.98); }
+.cap svg { width: 22px; height: 22px; fill: none; stroke: #b7a6ff; stroke-width: 1.7; stroke-linecap: round; }
+.cap span { font-size: 12px; color: var(--text); }
+.cap.primary {
+  background: linear-gradient(135deg, rgba(139,92,246,.28), rgba(34,211,238,.18));
+  border-color: rgba(139, 92, 246, .6);
+}
+.cap.primary svg { stroke: #d7c9ff; }
+
+.rec { margin-top: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.rec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.rec-head h3 { font-size: 12.5px; font-weight: 600; color: #cfd2f7; letter-spacing: .3px; }
+.seg { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 2px; }
+.seg button { padding: 3px 10px; font-size: 11.5px; border-radius: 6px; color: var(--muted); }
+.seg button.on { background: linear-gradient(135deg, var(--accent1), #6d4ae0); color: #fff; }
+.rec-opts { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.field { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; }
+.field select {
+  background: var(--bg); color: var(--text); border: 1px solid var(--line);
+  border-radius: 7px; padding: 4px 8px; font-size: 12px;
+}
+.check { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
+.check input { accent-color: var(--accent1); }
+.rec-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px; border-radius: 10px; font-weight: 600; font-size: 13px;
+  background: linear-gradient(135deg, #ef4444, #f43f5e); color: #fff;
+  box-shadow: 0 6px 18px rgba(244, 63, 94, .35);
+  transition: filter .12s, transform .12s;
+}
+.rec-btn:hover { filter: brightness(1.08); }
+.rec-btn:active { transform: scale(.98); }
+.rec-btn .dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.rec-btn.stopping { background: linear-gradient(135deg, #334, #556); box-shadow: none; }
+.rec-btn.stop { background: linear-gradient(135deg, #7c5cff, #22d3ee); }
+.rec-status { margin-top: 8px; color: var(--muted); font-size: 11.5px; text-align: center; }
+
+.err { margin-top: 10px; color: #fda4af; font-size: 12px; background: rgba(244,63,94,.12); border: 1px solid rgba(244,63,94,.35); padding: 8px 10px; border-radius: 8px; }
+
+.foot {
+  display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;
+  padding: 10px 12px 13px; color: var(--muted); font-size: 11px;
+}
+kbd {
+  background: var(--panel2); border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 4px; padding: 0 4px; font-size: 10px;
+}

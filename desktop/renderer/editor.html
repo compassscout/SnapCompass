@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>SnapCompass — Editor</title>
+<link rel="stylesheet" href="editor.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="../build/icon.png" alt="" width="24" height="24" />
+      <strong>SnapCompass</strong>
+      <span class="page-title" id="pageTitle"></span>
+    </div>
+    <div class="export">
+      <button id="btnCopy" class="btn ghost">Copy</button>
+      <button id="btnPng" class="btn">PNG</button>
+      <button id="btnJpg" class="btn">JPG</button>
+      <button id="btnPdf" class="btn accent">PDF</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <aside class="tools" id="tools">
+      <button data-tool="select" class="tool on" title="Move / pan (V)">
+        <svg viewBox="0 0 24 24"><path d="M6 3l12 9-7 1-3 6z"/></svg>
+      </button>
+      <button data-tool="pen" class="tool" title="Freehand pen (P)">
+        <svg viewBox="0 0 24 24"><path d="M4 20l1.5-4.5L16 5l3 3L8.5 18.5z"/></svg>
+      </button>
+      <button data-tool="line" class="tool" title="Line (L)">
+        <svg viewBox="0 0 24 24"><path d="M5 19L19 5"/></svg>
+      </button>
+      <button data-tool="arrow" class="tool" title="Arrow (A)">
+        <svg viewBox="0 0 24 24"><path d="M5 19L17 7M17 7h-6M17 7v6"/></svg>
+      </button>
+      <button data-tool="rect" class="tool" title="Rectangle (R)">
+        <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1.5"/></svg>
+      </button>
+      <button data-tool="ellipse" class="tool" title="Ellipse (E)">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8" ry="6"/></svg>
+      </button>
+      <button data-tool="text" class="tool" title="Text (T)">
+        <svg viewBox="0 0 24 24"><path d="M5 6h14M12 6v13"/></svg>
+      </button>
+      <button data-tool="mosaic" class="tool" title="Mosaic / blur (M)">
+        <svg viewBox="0 0 24 24"><path d="M4 4h5v5H4zM10 10h5v5h-5zM15 4h5v5h-5zM4 15h5v5H4zM15 15h5v5h-5z"/></svg>
+      </button>
+      <button data-tool="crop" class="tool" title="Crop (C)">
+        <svg viewBox="0 0 24 24"><path d="M7 3v14h14M3 7h14v14"/></svg>
+      </button>
+      <div class="sep"></div>
+      <div class="swatches" id="swatches"></div>
+      <input type="color" id="color" value="#ff3b5c" title="Custom color" />
+      <label class="opt"><span>Size</span><input type="range" id="size" min="2" max="24" value="4" /></label>
+      <label class="opt"><span>Font</span><input type="range" id="fontSize" min="12" max="72" value="24" /></label>
+      <div class="sep"></div>
+      <button id="btnUndo" class="tool wide" title="Undo (Ctrl+Z)">↺ Undo</button>
+      <button id="btnClear" class="tool wide danger" title="Remove all annotations">Clear</button>
+    </aside>
+
+    <div class="canvas-wrap" id="wrap">
+      <canvas id="stage"></canvas>
+      <div id="cropLayer" hidden></div>
+      <input id="textInput" hidden />
+      <div id="emptyState" hidden>
+        <div class="empty-card">
+          <h2>SnapCompass Editor</h2>
+          <p>Paste an image (<kbd>Ctrl</kbd>+<kbd>V</kbd>) or drop a file here to start annotating.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="statusbar">
+      <span id="dims"></span>
+      <span class="spacer"></span>
+      <button class="zoom" id="zoomOut">−</button>
+      <span id="zoomLabel">100%</span>
+      <button class="zoom" id="zoomIn">+</button>
+      <button class="zoom" id="zoomFit">Fit</button>
+    </footer>
+  </div>
+
+  <script src="../vendor/jspdf.umd.min.js"></script>
+  <script src="editor.js"></script>
+</body>
+</html>

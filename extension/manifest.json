@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "SnapCompass",
+  "version": "1.0.0",
+  "description": "Capture full page, region or visible screenshots, annotate them, record your screen to MP4/GIF, and export as PNG/JPG/PDF.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "scripting",
+    "storage",
+    "downloads",
+    "offscreen",
+    "tabCapture",
+    "desktopCapture",
+    "clipboardWrite",
+    "notifications",
+    "contextMenus"
+  ],
+  "commands": {
+    "capture-visible": {
+      "suggested_key": { "default": "Alt+Shift+S" },
+      "description": "Capture visible area"
+    },
+    "capture-fullpage": {
+      "suggested_key": { "default": "Alt+Shift+F" },
+      "description": "Capture full page"
+    },
+    "capture-region": {
+      "suggested_key": { "default": "Alt+Shift+R" },
+      "description": "Capture selected region"
+    }
+  },
+  "host_permissions": ["<all_urls>"],
+  "web_accessible_resources": [
+    {
+      "resources": ["vendor/*", "icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
